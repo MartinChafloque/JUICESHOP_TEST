@@ -16,8 +16,7 @@ jobs:
  
       - name: Install fcli
         run: |
-          FCLI_VERSION="v3.14.2"
-          curl -sL https://github.com/fortify/fcli/releases/${FCLI_VERSION}/download/fcli-linux.tgz | tar zx
+          curl -sL https://github.com/fortify/fcli/releases/latest/download/fcli-linux.tgz | tar zx
           sudo mv fcli /usr/local/bin/fcli
  
       - name: Authenticate to Fortify On Demand
