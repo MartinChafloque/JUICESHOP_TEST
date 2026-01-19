@@ -1,0 +1,43 @@
+name: FoD DAST API Scan
+ 
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+ 
+jobs:
+  fod-dast-api:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - name: Install fcli
+        run: |
+          FCLI_VERSION="v3.14.2"
+          curl -sL https://github.com/fortify/fcli/releases/${FCLI_VERSION}/download/fcli-linux.tgz | tar zx
+          sudo mv fcli /usr/local/bin/fcli
+ 
+      - name: Authenticate to Fortify On Demand
+        env:
+          FOD_URL: https://ams.fortify.com
+          FOD_TENANT: ${{ secrets.FOD_TENANT }}
+          FOD_USER: ${{ secrets.FOD_USER }}
+          FOD_PASSWORD: ${{ secrets.FOD_PAT }}
+        run: |
+          fcli fod session login \
+            --url "$FOD_URL" \
+            --tenant "$FOD_TENANT" \
+            --user "$FOD_USER" \
+            --password "$FOD_PASSWORD"
+
+      - name: Start Dynamic API Assessment (FoD API v3)
+        env:
+          RELEASE_ID: ${{ secrets.FOD_RELEASE_ID }}
+        run: |
+          START_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          fcli fod rest call "/api/v3/releases/${RELEASE_ID}/dynamic-scans/start-scan" \
+            -X POST \
+            -d "{\"startDate\":\"${START_DATE}\",\"assessmentTypeId\":299,\"entitlementId\":14214,\"entitlementFrequencyType\":\"Subscription\",\"isRemediationScan\":false}"
