@@ -34,7 +34,7 @@ jobs:
 
       - name: Start Dynamic API Assessment (FoD API v3)
         env:
-          RELEASE_ID: ${{ secrets.FOD_RELEASE_ID }}
+          RELEASE_ID: ${{ secrets.FOD_RELEASE }}
         run: |
           START_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           fcli fod rest call "/api/v3/releases/${RELEASE_ID}/dynamic-scans/start-scan" \
